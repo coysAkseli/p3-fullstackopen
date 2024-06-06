@@ -77,16 +77,27 @@ app.get('/api/phonebook', (request, response) => {
 })
 
 app.get('/api/phonebook/:id', (request, response) => {
-    PhonebookEntry.findById(request.params.id).then(pbEntry => {
-        response.json(pbEntry)
+    PhonebookEntry.findById(request.params.id)
+        .then(pbEntry => {
+            if (pbEntry) {
+                response.json(pbEntry)
+            }
+            else {
+                response.status(404).end()
+            }
+    })
+    .catch(error => {
+        console.log(error)
+        response.status(500).end()
     })
 })
 
-app.delete('/api/phonebook/:id', (request, response) => {
-    const id = Number(request.params.id)
-    phonebook = phonebook.filter(pbEntry => pbEntry.id !== id)
-
-    response.status(204).end()
+app.delete('/api/phonebook/:id', (request, response, next) => {
+    PhonebookEntry.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 const nameAlreadyExists = (name) => {
