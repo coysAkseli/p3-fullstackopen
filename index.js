@@ -15,9 +15,9 @@ const PhonebookEntry = require('./models/phonebookentry')
 //
 
 
+app.use(express.static('dist'))
 app.use(express.json())
 
-app.use(express.static('dist'))
 
 const cors = require('cors')
 app.use(cors())
@@ -76,7 +76,7 @@ app.get('/api/phonebook', (request, response) => {
     })
 })
 
-app.get('/api/phonebook/:id', (request, response) => {
+app.get('/api/phonebook/:id', (request, response, next) => {
     PhonebookEntry.findById(request.params.id)
         .then(pbEntry => {
             if (pbEntry) {
@@ -86,10 +86,10 @@ app.get('/api/phonebook/:id', (request, response) => {
                 response.status(404).end()
             }
     })
-    .catch(error => {
-        console.log(error)
-        response.status(500).end()
-    })
+    .catch(error => next(error)
+        //console.log(error)
+        //response.status(400).send({ error: 'malformatted id' })
+    )
 })
 
 app.delete('/api/phonebook/:id', (request, response, next) => {
@@ -136,6 +136,32 @@ app.post('/api/phonebook', (request, response) => {
     })
 })
 
+app.put('/api/phonebook/:id', (request, response, next) => {
+    const body = request.body
+
+    const pbEntry = {
+        name: body.name,
+        number: body.number,
+    }
+
+    PhonebookEntry.findByIdAndUpdate(request.params.id, pbEntry)
+        .then(updatedPbEntry => {
+            response.json(updatedPbEntry)
+        })
+        .catch(error => next(error))
+})
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
