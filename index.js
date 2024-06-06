@@ -35,8 +35,6 @@ app.use(morgan((tokens, req, res) => {
 ].join(' ')
 }))
 
-let dataToken = ''
-
 let phonebook = [
     {
         id: 1,
@@ -71,9 +69,10 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/phonebook', (request, response) => {
-    PhonebookEntry.find({}).then(phonebook => {
+    response.send(`<h1>this is /api/phonebook</h1>`)
+    /*PhonebookEntry.find({}).then(phonebook => {
         response.json(phonebook)
-    })
+    })*/
 })
 
 app.get('/api/phonebook/:id', (request, response, next) => {
