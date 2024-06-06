@@ -69,10 +69,9 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/phonebook', (request, response) => {
-    response.send(`<h1>this is /api/phonebook</h1>`)
-    /*PhonebookEntry.find({}).then(phonebook => {
+    PhonebookEntry.find({}).then(phonebook => {
         response.json(phonebook)
-    })*/
+    })
 })
 
 app.get('/api/phonebook/:id', (request, response, next) => {
