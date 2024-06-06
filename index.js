@@ -1,7 +1,20 @@
+const password = process.argv[2]
+const nameAdd = process.argv[3]
+const numberAdd = process.argv[4]
+
+const url =
+  `mongodb+srv://akseli:${password}@cluster0.btrda8b.mongodb.net/phonebookApp?retryWrites=true&w=majority`
+  
+require('dotenv').config()
 const express = require('express')
 var morgan = require('morgan')
-
 const app = express()
+
+const PhonebookEntry = require('./models/phonebookentry')
+
+//
+
+
 app.use(express.json())
 
 app.use(express.static('dist'))
@@ -58,19 +71,15 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/phonebook', (request, response) => {
-    response.json(phonebook)
+    PhonebookEntry.find({}).then(phonebook => {
+        response.json(phonebook)
+    })
 })
 
 app.get('/api/phonebook/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const pbEntry = phonebook.find(pbEntry => pbEntry.id === id)
-    
-    if (pbEntry) {
+    PhonebookEntry.findById(request.params.id).then(pbEntry => {
         response.json(pbEntry)
-    }
-    else {
-        response.status(404).end()
-    }
+    })
 })
 
 app.delete('/api/phonebook/:id', (request, response) => {
@@ -105,18 +114,19 @@ app.post('/api/phonebook', (request, response) => {
         })
     }
 
-    const pbEntry = {
+    const pbEntry = new PhonebookEntry({
         name: body.name,
         number: body.number,
         id: Math.floor(Math.random()*1000000)
-    }
+    })
 
-    phonebook = phonebook.concat(pbEntry)
-    response.json(pbEntry)
+    pbEntry.save().then(savedPbEntry => {
+        response.json(pbEntry)
+    })
 })
 
 
-const PORT = process.env.port || 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
