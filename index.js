@@ -102,7 +102,7 @@ const nameAlreadyExists = (name) => {
     return phonebook.some(pbEntry => pbEntry.name === name)
 }
 
-app.post('/api/phonebook', (request, response) => {
+app.post('/api/phonebook', (request, response, next) => {
     const body = request.body
 
     if (!body.name) {
@@ -132,17 +132,22 @@ app.post('/api/phonebook', (request, response) => {
     pbEntry.save().then(savedPbEntry => {
         response.json(pbEntry)
     })
+    .catch(error => next(error))
 })
 
 app.put('/api/phonebook/:id', (request, response, next) => {
-    const body = request.body
+    const { name, number } = request.body
 
-    const pbEntry = {
+/*    const pbEntry = {
         name: body.name,
         number: body.number,
-    }
+    }*/
 
-    PhonebookEntry.findByIdAndUpdate(request.params.id, pbEntry)
+    PhonebookEntry.findByIdAndUpdate(
+        request.params.id, 
+        { name, number }, 
+        { new: true, runValidators: true, context: 'query' }
+    )
         .then(updatedPbEntry => {
             response.json(updatedPbEntry)
         })
@@ -154,6 +159,9 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    }
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)

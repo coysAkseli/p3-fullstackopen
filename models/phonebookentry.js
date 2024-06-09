@@ -15,8 +15,11 @@ mongoose.connect(url)
     })
 
 const pbSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    name: {
+        type: String,
+        minLength: 3
+    },
+    number: String
 })
 
 pbSchema.set('toJSON', {
