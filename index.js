@@ -1,6 +1,6 @@
 const password = process.argv[2]
-const nameAdd = process.argv[3]
-const numberAdd = process.argv[4]
+//const nameAdd = process.argv[3]
+//const numberAdd = process.argv[4]
 
 const url =
   `mongodb+srv://akseli:${password}@cluster0.btrda8b.mongodb.net/phonebookApp?retryWrites=true&w=majority`
