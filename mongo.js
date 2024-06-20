@@ -36,7 +36,7 @@ else {
       name: nameAdd,
       number: numberAdd,
     })
-    
+
     pbEntry.save().then(result => {
       console.log(`added ${nameAdd} number ${numberAdd} to phonebook`)
       mongoose.connection.close()
